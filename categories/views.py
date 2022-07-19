@@ -1,3 +1,16 @@
-from django.shortcuts import render
+from django.http  import JsonResponse
+from django.views import View 
 
-# Create your views here.
+from categories.models       import FirstCategory
+
+class CategoryView(View): 
+    # http -v GET 127.0.0.1:8000/categories
+    def get(self, request):
+        first_categories = FirstCategory.objects.all()
+        result = {}
+
+        for first_category in first_categories:
+            second_categories = first_category.second_categories.all()
+            result[first_category.title] = [second_category.title for second_category in second_categories]
+       
+        return JsonResponse({'message' : result}, status=200)
