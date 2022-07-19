@@ -16,19 +16,19 @@ class Product(TimeStampModel):
     price           = models.DecimalField(decimal_places=3, max_digits=10)
     stock           = models.IntegerField()
     discount        = models.DecimalField(null=True, decimal_places=0, max_digits=3)
-    type            = models.ManyToManyField('Type')
+    types           = models.ManyToManyField('Type')
 
     class Meta:
         db_table = 'products'
 
-class Thumbnail_image(models.Model):
+class ThumbnailImage(models.Model):
     url     = models.URLField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='thumbnail_images')
     
     class Meta:
         db_table = 'thumbnail_images'
 
-class Detail_image(models.Model):
+class DetailImage(models.Model):
     url     = models.URLField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='detail_images')
     
