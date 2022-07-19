@@ -11,13 +11,13 @@ class Order(TimeStampModel) :
        db_table = 'orders'
 
 
-class OrdersStatus(models.Model) :
+class OrderStatus(models.Model) :
     status = models.CharField(max_length=200)
 
     class Meta :
        db_table = 'orders_status'
 
-class OrderItems(models.Model) :
+class OrderItem(models.Model) :
     order              = models.ForeignKey('Order', on_delete=models.CASCADE)
     product            = models.ForeignKey('products.Product', on_delete=models.CASCADE)
     quantity           = models.IntegerField()
@@ -26,7 +26,7 @@ class OrderItems(models.Model) :
     class Meta :
        db_table = 'order_items'
 
-class OrderItemsStatus(models.Model) :
+class OrderItemStatus(models.Model) :
     status = models.CharField(max_length=200)
 
     class Meta :
