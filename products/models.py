@@ -22,14 +22,14 @@ class Product(TimeStampModel):
         db_table = 'products'
 
 class Thumbnail_image(models.Model):
-    url = models.URLField()
+    url     = models.URLField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='thumbnail_images')
     
     class Meta:
         db_table = 'thumbnail_images'
 
 class Detail_image(models.Model):
-    url = models.URLField()
+    url     = models.URLField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='detail_images')
     
     class Meta:
