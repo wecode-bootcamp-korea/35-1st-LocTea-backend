@@ -3,7 +3,7 @@ from django.db          import models
 from categories.models  import SecondCategory
 from core.models        import TimeStampModel
 
-class Product(models.Model):
+class Product(TimeStampModel):
     title           = models.CharField(max_length=45)
     description     = models.TextField()
     second_category = models.ForeignKey(SecondCategory, on_delete=models.CASCADE)
