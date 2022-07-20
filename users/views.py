@@ -1,4 +1,8 @@
-import json, re, bcrypt, jwt
+import json
+import re
+
+import bcrypt
+import jwt
 
 from django.http   import JsonResponse
 from django.views  import View
@@ -19,7 +23,7 @@ class SignUpView(View):
 
             REGEX_ID       = '^[a-zA-Z0-9]{4,12}$'
             REGEX_PASSWORD = '^(?=.*[a-z])(?=.*\d)(?=.*[$@$!%*#?&])[a-z\d$@$!%*#?&]{8,16}$'
-            REGEX_BIRTHDAY = '^(19[0-9][0-9]|20\d{2})-(0[0-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$'
+            REGEX_BIRTHDAY = '^(19\d{2}|20\d{2})-(0[0-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$'
 
             if not re.match(REGEX_ID, username):
                 return JsonResponse({"message":"ID_VALIDATION_ERROR"}, status=400)
