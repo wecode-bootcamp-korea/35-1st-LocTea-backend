@@ -5,9 +5,10 @@ from products.models    import Product, ThumbnailImage, DetailImage
 from categories.models  import FirstCategory, SecondCategory
 
 class ProductListView(View):
-    # http -v GET 127.0.0.1:8000/products/1/2
-    def get(self, request, **kwargs):
-        products = Product.objects.filter(second_category_id=kwargs['second_category_id'])
+    # 엔드포인트는 127.0.0.1:8000/products/list?category=1
+    # http -v GET 127.0.0.1:8000/products/list category==1
+    def get(self, request):
+        products = Product.objects.filter(second_category_id=request.GET['category'])
         result = []
         for product in products:
             result.append({
