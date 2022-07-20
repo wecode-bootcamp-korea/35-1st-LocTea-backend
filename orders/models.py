@@ -21,7 +21,7 @@ class OrderItem(models.Model) :
     order              = models.ForeignKey('Order', on_delete=models.CASCADE)
     product            = models.ForeignKey('products.Product', on_delete=models.CASCADE)
     quantity           = models.IntegerField()
-    order_items_status = models.ForeignKey('OrderItemsStatus', on_delete=models.CASCADE)
+    order_items_status = models.ForeignKey('OrderItemStatus', on_delete=models.CASCADE)
 
     class Meta :
        db_table = 'order_items'
