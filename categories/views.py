@@ -8,13 +8,23 @@ class CategoryView(View):
     def get(self, request):
         try:
             first_categories = FirstCategory.objects.all()
+            '''
+            # 한글명만 전달
             result = {}
-
             for first_category in first_categories:
                 second_categories = first_category.second_categories.all()
                 result[first_category.title] = [second_category.title for second_category in second_categories]
-        
+            '''
+            result = []
+            for first_category in first_categories:
+                second_categories = first_category.second_categories.all()
+                result.append({
+                    'first_category_id' : first_category.id,
+                    'title' : first_category.title,
+                    'second_categories' : [{ 'second_category_id' : second_category.id, 'title' : second_category.title } for second_category in second_categories]})
+
             return JsonResponse({'result' : result}, status=200)
 
         except:
             return JsonResponse({'result' : 'INVALID_REQUEST'}, status=404)
+
