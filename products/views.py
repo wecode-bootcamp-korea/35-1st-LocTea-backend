@@ -5,10 +5,8 @@ from products.models    import Product, ThumbnailImage, DetailImage
 from categories.models  import FirstCategory, SecondCategory
 
 class ProductItemView(View):
-    # http -v GET 127.0.0.1:8000/products/2
-    def get(self, request, **kwargs):
+    def get(self, request, product_id):
         try:
-            product_id = kwargs['product_id']
             product = Product.objects.get(id=product_id)
             second_category = SecondCategory.objects.get(id=product.second_category.id)
 
