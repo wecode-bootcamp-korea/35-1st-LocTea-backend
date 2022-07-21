@@ -1,8 +1,7 @@
 from django.http        import JsonResponse
 from django.views       import View
 
-from products.models    import Product, ThumbnailImage, DetailImage
-from categories.models  import FirstCategory, SecondCategory
+from products.models    import Product
 
 class ProductListView(View):
     def get(self, request):
