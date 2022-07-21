@@ -24,7 +24,7 @@ class ProductItemView(View):
             return JsonResponse({'result': result}, status=200)
 
         except Product.DoesNotExist:
-            return JsonResponse({'message' : 'INVALID_PRODUCT'}, status = 401)
+            return JsonResponse({'message' : 'INVALID_PRODUCT'}, status = 404)
 
         except SecondCategory.DoesNotExist:
-            return JsonResponse({'message' : 'INVALID_SECOND_CATEGORY'}, status = 401)
+            return JsonResponse({'message' : 'INVALID_SECOND_CATEGORY'}, status = 404)
