@@ -2,11 +2,17 @@ from django.http        import JsonResponse
 from django.views       import View
 
 from products.models    import Product
+from categories.models  import SecondCategory
 
 class ProductListView(View):
     def get(self, request):
-        products = Product.objects.filter(second_category_id=request.GET['category'])
+        category_id = request.GET['category']
+        if not SecondCategory.objects.filter(id=category_id).exists():
+            return JsonResponse({'result': 'INVALID_CATEGORY'}, status=404)
+
         result = []
+        
+        products = Product.objects.filter(second_category_id=category_id)
         for product in products:
             result.append({
                 'id'              : product.id,
