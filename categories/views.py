@@ -10,8 +10,8 @@ class CategoryView(View):
                 'first_category_id': first_category.id,
                 'title'            : first_category.title,
                 'second_categories': [{ 
-                    'second_category_id': second_category.id,
-                    'title'             : second_category.title
+                'second_category_id': second_category.id,
+                'title'             : second_category.title
                 } for second_category in first_category.second_categories.all()]}
                 for first_category in first_categories]
 
