@@ -9,11 +9,13 @@ class CategoryView(View):
         result = []
 
         for first_category in first_categories:
-            second_categories = first_category.second_categories.all()
             result.append({
                 'first_category_id': first_category.id,
                 'title'            : first_category.title,
-                'second_categories': [{ 'second_category_id' : second_category.id, 'title' : second_category.title } for second_category in second_categories]})
+                'second_categories': [{ 
+                    'second_category_id': second_category.id,
+                    'title'             : second_category.title
+                    } for second_category in first_category.second_categories.all()]})
 
         return JsonResponse({'result' : result}, status=200)
 
