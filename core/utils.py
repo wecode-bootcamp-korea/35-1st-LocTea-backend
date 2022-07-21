@@ -9,8 +9,6 @@ from django.conf        import settings
 def LoginDecorator(func):
     def wrapper(self, request, *args, **kwargs):
         try:
-            if 'Authorization' not in request.headers:
-                return JsonResponse({'message' : 'no authorization'}, status = 401)
 
             access_token = request.headers.get('Authorization')
             payload      = jwt.decode(access_token, settings.SECRET_KEY, settings.ALGORITHM)
