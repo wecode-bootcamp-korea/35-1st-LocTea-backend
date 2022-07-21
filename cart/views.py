@@ -19,7 +19,6 @@ class CartView(View) :
             product_id = data['product_id']
             quantity   = data['quantity']
 
-
             if not Product.objects.filter(id=product_id).exists():
                 return JsonResponse({'message':'PRODUCT_NOT_EXIST'}, status=400)
 
@@ -34,7 +33,8 @@ class CartView(View) :
             cart.save()
             return JsonResponse({'message': 'SUCCESS'}, status=201)
 
-
+        except Cart.DoesNotExist :
+            return JSONDecodeError({'message':'INVAILD_CART'}, status=400)
         except JSONDecodeError :
             return JsonResponse({'message':'JSON_DECODE_ERROR'}, status=400)
         except KeyError :
@@ -42,11 +42,7 @@ class CartView(View) :
 
     @LoginDecorator
     def get(self, request):
-        user = request.user
-
-        if not Cart.objects.filter(user=user).exists():
-            return JsonResponse({'message':'USER_CART_NOT_EXIST'}, status=400)
-
+        user  = request.user
         carts = Cart.objects.filter(user=user)
         
         result = [{
