@@ -34,8 +34,7 @@ class CartView(View) :
             cart.save()
             return JsonResponse({'message': 'SUCCESS'}, status=201)
 
-        except Cart.DoesNotExist :
-            return JsonResponse({'message':'INVALID_CART'}, status=400)
+
         except JSONDecodeError :
             return JsonResponse({'message':'JSON_DECODE_ERROR'}, status=400)
         except KeyError :
@@ -67,11 +66,7 @@ class CartView(View) :
         try:    
             user    = request.user
             cart_id = request.GET.get('id')
-
-            if not Cart.objects.get(id=cart_id, user=user).exist():
-                return JsonResponse({'message':'INVAILD_CART_ID'}, status=404)
-
-            cart = Cart.objects.get(id=cart_id, user=user)
+            cart    = Cart.objects.get(id=cart_id, user=user)
 
             cart.delete()
             return JsonResponse({'message':'DELETED'}, status=200)
@@ -88,9 +83,6 @@ class CartView(View) :
             user     = request.user
             cart_id  = request.GET.get('id')
             quantity = data['quantity']
-
-            if not Cart.objects.filter(id=cart_id, user=user).exists():
-                return JSONDecodeError({'message':'INVALID_CART_ID'}, status=404)
 
             if quantity <= 0:
                 return JSONDecodeError({'message':'QUANTITY_ERROR'}, status=400)
