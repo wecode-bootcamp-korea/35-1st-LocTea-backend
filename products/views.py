@@ -17,3 +17,4 @@ class ProductListView(View):
                 'types'           : [type.name for type in product.types.all()]
             })
         return JsonResponse({'result': result}, status=200)
+    
