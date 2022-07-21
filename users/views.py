@@ -24,6 +24,7 @@ class SignUpView(View):
             REGEX_ID       = '^[a-zA-Z0-9]{4,12}$'
             REGEX_PASSWORD = '^(?=.*[a-z])(?=.*\d)(?=.*[$@$!%*#?&])[a-z\d$@$!%*#?&]{8,16}$'
             REGEX_BIRTHDAY = '^(19\d{2}|20\d{2})-(0[0-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$'
+            
 
             if not re.match(REGEX_ID, username):
                 return JsonResponse({"message":"ID_VALIDATION_ERROR"}, status=400)
@@ -40,11 +41,11 @@ class SignUpView(View):
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
             User.objects.create(
-             name          = name,
-             username      = username,
-             password      = hashed_password,
-             mobile_number = mobile_number,
-             birth_day     = birth_day,
+                name          = name,
+                username      = username,
+                password      = hashed_password,
+                mobile_number = mobile_number,
+                birth_day     = birth_day,
             )
             return JsonResponse({'message':'SUCCESS'}, status=201)
             
