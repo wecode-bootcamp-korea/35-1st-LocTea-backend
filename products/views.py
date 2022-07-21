@@ -8,13 +8,12 @@ class ProductItemView(View):
     def get(self, request, product_id):
         try:
             product = Product.objects.get(id=product_id)
-            second_category = SecondCategory.objects.get(id=product.second_category.id)
 
             result = {
                 'title'           : product.title,
                 'description'     : product.description,
-                'first_category'  : second_category.first_category.title,
-                'second_category' : second_category.title,
+                'first_category'  : product.second_category.first_category.title,
+                'second_category' : product.second_category.title,
                 'price'           : product.price,
                 'stock'           : product.stock,
                 'discount'        : product.discount,
