@@ -31,7 +31,11 @@ class CartView(View) :
             )
             cart.quantity += quantity
             cart.save()
+            
+            if is_created == 1 :
+                return JsonResponse({'message': 'UPDATE'}, status=204)
             return JsonResponse({'message': 'SUCCESS'}, status=201)
+            
 
         except Cart.DoesNotExist :
             return JSONDecodeError({'message':'INVAILD_CART'}, status=400)
