@@ -22,8 +22,6 @@ class ProductListView(View):
         
         if first_category_id:
 
-
-
         
         for product in products:
             result.append({
