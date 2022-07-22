@@ -3,7 +3,6 @@ from django.views       import View
 from django.db.models   import Q
 
 from products.models    import Product
-from categories.models  import SecondCategory
 
 class ProductListView(View):
     def get(self, request):
@@ -13,36 +12,36 @@ class ProductListView(View):
         types              = request.GET.get('type', None)
 
         filter_queries = Q()
-        order_queries = Q()
+        order_string = ''
 
-        '''
-        # 쿼리 파라미터가 없는 경우 
-        if not request.GET:
-            # 1차 카테고리 아이디 1번에 속한 모든 제품을 신상품 순으로 보여줌 
-            q = Q(second_category__first_category_id=1).order_by('-created_at')
-        '''
-
-        # 쿼리 파라미터가 없는 경우 - 1차 카테고리 아이디 1번에 속한 모든 제품을 신상품 순으로 보여줌
         if not request.GET:
             filter_queries &= Q(second_category__first_category_id=1)
 
-        # 1차 카테고리를 선택한 경우
         if first_category_id:
             filter_queries &= Q(second_category__first_category_id = first_category_id)
         
-        # 2차 카테고리를 선택한 경우
         if second_category_id:
             filter_queries &= Q(second_category = second_category_id)
 
-        # 1차 필터를 선택한 경우
-        if sort:
-            ordering &= Q()
+        if types:
+            type_queries = Q()
+            
+            for type in types.split(','):
+                type_queries |= Q(types__name=type)
 
-        # 2차 필터를 선택한 경우
+            filter_queries &= type_queries
+
+        if not sort or sort == 'new-arrival':
+            order_string = '-created_at'
         
-
+        elif sort == 'price-desc':
+            order_string = 'price'
+        
+        else:
+            order_string = '-price'
+        
         result = []
-        products = Product.objects.filter(filter_queries)
+        products = Product.objects.filter(filter_queries).order_by(order_string).distinct()
     
         for product in products:
             result.append({
