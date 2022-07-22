@@ -26,15 +26,15 @@ class CartView(View) :
                 return JsonResponse({'message':'QUANTITY_ERROR'}, status=400)
         
             cart, is_created  = Cart.objects.get_or_create(
-                user       = user,
-                product_id = product_id
+                user_id       = user.id,
+                product_id    = product_id
             )
             cart.quantity += quantity
             cart.save()
             
-            if is_created == 1 :
-                return JsonResponse({'message': 'UPDATE'}, status=204)
-            return JsonResponse({'message': 'SUCCESS'}, status=201)
+            if is_created == 0 :
+                return JsonResponse({'message': 'UPDATE_SUCCESS'}, status=200)
+            return JsonResponse({'message': 'CREATE_SUCCESS'}, status=201)
             
         except Cart.DoesNotExist :
             return JSONDecodeError({'message':'INVAILD_CART'}, status=400)
@@ -45,17 +45,20 @@ class CartView(View) :
 
     @LoginDecorator
     def get(self, request):
-        user  = request.user
-        carts = Cart.objects.filter(user=user)
+        user  = request.user.id
+        carts = Cart.objects.filter(user_id=user)
         
         result = [{
-            'user_id'   : user,
-            'cart_id'   : cart.id,
-            'product_id': cart.product.id,
-            'title'     : cart.product.title,
-            'quantity'  : cart.quantity,
-            'price'     : cart.product.price,
-            'image'     : cart.product.thumbnailimage_set.get().image_url
+            'username'        : user,
+            'cart_id'         : cart.id,
+            'product_id'      : cart.product.id,
+            'title'           : cart.product.title,
+            'quantity'        : cart.quantity,
+            'price'           : cart.product.price,
+            'thumbnail_images': cart.product.thumbnail_images.first().url,
+            'discount'        : cart.product.discount,
+            'stock'           : cart.product.stock
+
         } for cart in carts]
 
         return JsonResponse({"result":result}, status = 200)
@@ -63,8 +66,9 @@ class CartView(View) :
     @LoginDecorator
     def delete(self, request):
         try:    
+            data    = json.loads(request.body)
             user    = request.user
-            cart_id = request.GET.get('id')
+            cart_id = data['cart_id']
             cart    = Cart.objects.get(id=cart_id, user=user)
 
             cart.delete()
@@ -79,10 +83,10 @@ class CartView(View) :
     def patch(self, request) :
         try :
             data     = json.loads(request.body)
-            user     = request.user
-            cart_id  = request.GET.get('id')
+            user     = request.user.id
+            cart_id  = data['cart_id']
             quantity = data['quantity']
-
+           
             if quantity <= 0:
                 return JSONDecodeError({'message':'QUANTITY_ERROR'}, status=400)
 
@@ -93,6 +97,8 @@ class CartView(View) :
             return JsonResponse({'quantity':cart.quantity}, status=200)
 
         except MultipleObjectsReturned:
-            return JSONDecodeError({'message':'MULTIPLE_OBJECT_RETURNED'}, status=400)
-        except ValueError :
-            return JSONDecodeError({'message':'VALUE_ERROR'}, status=400)
+            return JsonResponse({'message':'MULTIPLE_OBJECT_RETURNED'}, status=400)
+        except JSONDecodeError :
+            return JsonResponse({'message':'JSON_DECODE_ERROR'}, status=400)
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)   
