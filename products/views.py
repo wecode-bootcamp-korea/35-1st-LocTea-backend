@@ -6,22 +6,23 @@ from products.models    import Product
 
 class ProductListView(View):
     def get(self, request):
-        first_category_id  = request.GET.get('first-category', None)
-        second_category_id = request.GET.get('second-category', None)
-        sort               = request.GET.get('sort', None)
-        types              = request.GET.get('type', None)
+        first_category_id  = request.GET.get('first-category')
+        second_category_id = request.GET.get('second-category')
+        sort               = request.GET.get('sort')
+        types              = request.GET.get('type')
 
-        filter_queries = Q()
-        order_string = ''
+        queries = Q()
+        ordering = ''
 
         if not request.GET:
-            filter_queries &= Q(second_category__first_category_id=1)
+            queries &= Q(second_category__first_category_id=1)
+            ordering = '-created_at'
 
         if first_category_id:
-            filter_queries &= Q(second_category__first_category_id = first_category_id)
+            queries &= Q(second_category__first_category_id = first_category_id)
         
         if second_category_id:
-            filter_queries &= Q(second_category = second_category_id)
+            queries &= Q(second_category = second_category_id)
 
         if types:
             type_queries = Q()
@@ -29,19 +30,19 @@ class ProductListView(View):
             for type in types.split(','):
                 type_queries |= Q(types__name=type)
 
-            filter_queries &= type_queries
+            queries &= type_queries
 
         if not sort or sort == 'new-arrival':
-            order_string = '-created_at'
+            ordering = '-created_at'
         
         elif sort == 'price-desc':
-            order_string = 'price'
+            ordering = 'price'
         
         else:
-            order_string = '-price'
+            ordering = '-price'
         
         result = []
-        products = Product.objects.filter(filter_queries).order_by(order_string).distinct()
+        products = Product.objects.filter(queries).order_by(ordering).distinct()
     
         for product in products:
             result.append({
