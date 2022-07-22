@@ -10,9 +10,10 @@ class ProductListView(View):
         first_category_id  = request.GET.get('first-category', None)
         second_category_id = request.GET.get('second-category', None)
         sort               = request.GET.get('sort', None)
-        types               = request.GET.get('type', None)
+        types              = request.GET.get('type', None)
 
-        query = Q()
+        filter_queries = Q()
+        order_queries = Q()
 
         '''
         # 쿼리 파라미터가 없는 경우 
@@ -23,23 +24,25 @@ class ProductListView(View):
 
         # 쿼리 파라미터가 없는 경우 - 1차 카테고리 아이디 1번에 속한 모든 제품을 신상품 순으로 보여줌
         if not request.GET:
-            query &= Q(second_category__first_category_id=1)
+            filter_queries &= Q(second_category__first_category_id=1)
 
         # 1차 카테고리를 선택한 경우
         if first_category_id:
-            query &= Q(second_category__first_category_id = first_category_id)
+            filter_queries &= Q(second_category__first_category_id = first_category_id)
         
         # 2차 카테고리를 선택한 경우
         if second_category_id:
-            query &= Q(second_category = second_category_id)
+            filter_queries &= Q(second_category = second_category_id)
 
         # 1차 필터를 선택한 경우
+        if sort:
+            ordering &= Q()
 
         # 2차 필터를 선택한 경우
         
 
         result = []
-        products = Product.objects.filter(query)
+        products = Product.objects.filter(filter_queries)
     
         for product in products:
             result.append({
