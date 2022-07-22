@@ -55,7 +55,7 @@ class CartView(View) :
             'title'           : cart.product.title,
             'quantity'        : cart.quantity,
             'price'           : cart.product.price,
-            'thumbnail_images': cart.product.thumbnail_images.first().url,
+            'thumbnail_images': cart.product.thumbnail_images.first(),
             'discount'        : cart.product.discount,
             'stock'           : cart.product.stock
 
