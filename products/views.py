@@ -10,6 +10,7 @@ class ProductItemView(View):
             product = Product.objects.get(id=product_id)
 
             result = {
+                'id'              : product_id,
                 'title'           : product.title,
                 'description'     : product.description,
                 'first_category'  : product.second_category.first_category.title,
