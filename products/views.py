@@ -4,6 +4,7 @@ from django.db.models      import Q
 from django.core.paginator import Paginator
 
 from products.models    import Product
+from categories.models    import FirstCategory, SecondCategory
 
 class ProductListView(View):
     def get(self, request):
@@ -17,13 +18,19 @@ class ProductListView(View):
         queries = Q()
 
         if not request.GET:
-            queries &= Q(second_category__first_category_id=1)
+            queries &= Q(second_category__first_category_id = 1)
 
         if first_category_id:
-            queries &= Q(second_category__first_category_id = first_category_id)
+            if FirstCategory.objects.filter(id=first_category_id).exists():
+                queries &= Q(second_category__first_category_id = first_category_id)
+            else:
+                return JsonResponse({'result': 'INVALID_FIRST_CATEGORY'}, status=404)
         
         if second_category_id:
-            queries &= Q(second_category = second_category_id)
+            if SecondCategory.objects.filter(id=second_category_id).exists():
+                queries &= Q(second_category = second_category_id)
+            else:
+                return JsonResponse({'result': 'INVALID_SECOND_CATEGORY'}, status=404)
 
         if tea_types:
             tea_type_queries = Q()
@@ -62,7 +69,7 @@ class ProductListView(View):
             result.append({
                 'id'              : page_item.id,
                 'title'           : page_item.title,
-                'price'           : int(page_item.price),
+                'price'           : page_item.price,
                 'stock'           : page_item.stock,
                 'thumbnail_images': [image.url for image in page_item.thumbnail_images.all()],
                 'types'           : [type.name for type in page_item.types.all()]
