@@ -15,11 +15,9 @@ class ProductListView(View):
         offset             = int(request.GET.get('offset', 1))
 
         queries = Q()
-        ordering = ''
 
         if not request.GET:
             queries &= Q(second_category__first_category_id=1)
-            ordering = '-created_at'
 
         if first_category_id:
             queries &= Q(second_category__first_category_id = first_category_id)
@@ -35,26 +33,26 @@ class ProductListView(View):
 
             queries &= tea_type_queries
 
-        if not sort or sort == 'new-arrival':
-            ordering = '-created_at'
-        
-        elif sort == 'price-desc':
-            ordering = 'price'
-        
-        else:
+        ordering = '-created_at'
+
+        if sort == 'price-desc':
             ordering = '-price'
+        
+        elif sort == 'price-asc':
+            ordering = 'price'
         
         result = []
         products = Product.objects.filter(queries).order_by(ordering).distinct()
-        p = Paginator(products, limit)
         
-        pages_number = p.num_pages
-        if offset < 1 or offset > pages_number:
+        p = Paginator(products, limit)
+        pages_count = p.num_pages
+
+        if offset < 1 or offset > pages_count:
             return JsonResponse({'result': 'INVALID_PAGE'}, status=404)
 
         result.append({
             'total_items' : products.count(),
-            'total_pages' : pages_number,
+            'total_pages' : pages_count,
             'current_page': offset,
             'limit'       : limit
             })
