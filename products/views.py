@@ -15,20 +15,17 @@ class ProductListView(View):
         limit              = int(request.GET.get('limit', 10))
         offset             = int(request.GET.get('offset', 1))
 
-        queries = Q()
-
-        if not request.GET:
-            queries &= Q(second_category__first_category_id = 1)
+        queries = Q(second_category__first_category_id = 1)
 
         if first_category_id:
             if FirstCategory.objects.filter(id=first_category_id).exists():
-                queries &= Q(second_category__first_category_id = first_category_id)
+                queries = Q(second_category__first_category_id = first_category_id)
             else:
                 return JsonResponse({'result': 'INVALID_FIRST_CATEGORY'}, status=404)
         
         if second_category_id:
             if SecondCategory.objects.filter(id=second_category_id).exists():
-                queries &= Q(second_category = second_category_id)
+                queries = Q(second_category = second_category_id)
             else:
                 return JsonResponse({'result': 'INVALID_SECOND_CATEGORY'}, status=404)
 
