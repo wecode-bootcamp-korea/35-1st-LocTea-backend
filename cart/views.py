@@ -55,12 +55,12 @@ class CartView(View) :
             'title'           : cart.product.title,
             'quantity'        : cart.quantity,
             'price'           : cart.product.price,
-            'thumbnail_images': cart.product.thumbnail_images.first(),
+            'thumbnail_images': cart.product.thumbnail_images.first().url,
             'discount'        : cart.product.discount,
             'stock'           : cart.product.stock
-
+            
         } for cart in carts]
-
+     
         return JsonResponse({"result":result}, status = 200)
     
     @LoginDecorator
