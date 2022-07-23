@@ -8,10 +8,10 @@ from django.core.exceptions import MultipleObjectsReturned
 from cart.models            import Cart
 from users.models           import User
 from products.models        import Product
-from core.utils             import LoginDecorator
+from core.utils             import login_decorator
 
 class CartView(View) :
-    @LoginDecorator
+    @login_decorator
     def post(self, request) :
         try :
             data       = json.loads(request.body)
@@ -43,7 +43,7 @@ class CartView(View) :
         except KeyError :
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
 
-    @LoginDecorator
+    @login_decorator
     def get(self, request):
         user  = request.user.id
         carts = Cart.objects.filter(user_id=user)
@@ -63,7 +63,7 @@ class CartView(View) :
      
         return JsonResponse({"result":result}, status = 200)
     
-    @LoginDecorator
+    @login_decorator
     def delete(self, request):
         try:    
             data    = json.loads(request.body)
@@ -79,7 +79,7 @@ class CartView(View) :
         except ValueError :
             return JsonResponse({'message':'VAULE_ERROR'}, status=400)
 
-    @LoginDecorator
+    @login_decorator
     def patch(self, request) :
         try :
             data     = json.loads(request.body)
