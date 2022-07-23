@@ -1,6 +1,7 @@
-from django.http        import JsonResponse
-from django.views       import View
-from django.db.models   import Q
+from django.http           import JsonResponse
+from django.views          import View
+from django.db.models      import Q
+from django.core.paginator import Paginator
 
 from products.models    import Product
 
@@ -10,6 +11,8 @@ class ProductListView(View):
         second_category_id = request.GET.get('second-category')
         sort               = request.GET.get('sort')
         types              = request.GET.get('type')
+        limit              = request.GET.get('limit', 10)
+        offset             = request.GET.get('offset', 1)
 
         queries = Q()
         ordering = ''
@@ -41,17 +44,20 @@ class ProductListView(View):
         else:
             ordering = '-price'
         
-        result = []
         products = Product.objects.filter(queries).order_by(ordering).distinct()
-    
-        for product in products:
+        
+        p = Paginator(products, limit)
+        page_items = p.page(offset) # Emptypage인 경우 handling하기
+        result = []
+        
+        for page_item in page_items:
             result.append({
-                'id'              : product.id,
-                'title'           : product.title,
-                'price'           : product.price,
-                'stock'           : product.stock,
-                'thumbnail_images': [image.url for image in product.thumbnail_images.all()],
-                'types'           : [type.name for type in product.types.all()]
+                'id'              : page_item.id,
+                'title'           : page_item.title,
+                'price'           : page_item.price,
+                'stock'           : page_item.stock,
+                'thumbnail_images': [image.url for image in page_item.thumbnail_images.all()],
+                'types'           : [type.name for type in page_item.types.all()]
             })
 
         return JsonResponse({'result': result}, status=200)
