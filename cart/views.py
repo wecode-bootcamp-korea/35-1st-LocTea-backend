@@ -8,17 +8,16 @@ from django.core.exceptions import MultipleObjectsReturned
 from cart.models            import Cart
 from users.models           import User
 from products.models        import Product
-from core.utils             import LoginDecorator
+from core.utils             import login_decorator
 
 class CartView(View) :
-    @LoginDecorator
+    @login_decorator
     def post(self, request) :
         try :
             data       = json.loads(request.body)
             user       = request.user
             product_id = data['product_id']
             quantity   = data['quantity']
-
 
             if not Product.objects.filter(id=product_id).exists():
                 return JsonResponse({'message':'PRODUCT_NOT_EXIST'}, status=400)
@@ -27,45 +26,49 @@ class CartView(View) :
                 return JsonResponse({'message':'QUANTITY_ERROR'}, status=400)
         
             cart, is_created  = Cart.objects.get_or_create(
-                user       = user,
-                product_id = product_id
+                user_id       = user.id,
+                product_id    = product_id
             )
             cart.quantity += quantity
             cart.save()
-            return JsonResponse({'message': 'SUCCESS'}, status=201)
-
-
+            
+            if is_created == 0 :
+                return JsonResponse({'message': 'UPDATE_SUCCESS'}, status=200)
+            return JsonResponse({'message': 'CREATE_SUCCESS'}, status=201)
+            
+        except Cart.DoesNotExist :
+            return JSONDecodeError({'message':'INVAILD_CART'}, status=400)
         except JSONDecodeError :
             return JsonResponse({'message':'JSON_DECODE_ERROR'}, status=400)
         except KeyError :
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
 
-    @LoginDecorator
+    @login_decorator
     def get(self, request):
-        user = request.user
-
-        if not Cart.objects.filter(user=user).exists():
-            return JsonResponse({'message':'USER_CART_NOT_EXIST'}, status=400)
-
-        carts = Cart.objects.filter(user=user)
+        user  = request.user.id
+        carts = Cart.objects.filter(user_id=user)
         
         result = [{
-            'user_id'   : user,
-            'cart_id'   : cart.id,
-            'product_id': cart.product.id,
-            'title'     : cart.product.title,
-            'quantity'  : cart.quantity,
-            'price'     : cart.product.price,
-            'image'     : cart.product.thumbnailimage_set.get().image_url
+            'username'        : user,
+            'cart_id'         : cart.id,
+            'product_id'      : cart.product.id,
+            'title'           : cart.product.title,
+            'quantity'        : cart.quantity,
+            'price'           : cart.product.price,
+            'thumbnail_images': cart.product.thumbnail_images.first().url,
+            'discount'        : cart.product.discount,
+            'stock'           : cart.product.stock
+            
         } for cart in carts]
-
+     
         return JsonResponse({"result":result}, status = 200)
     
-    @LoginDecorator
+    @login_decorator
     def delete(self, request):
         try:    
+            data    = json.loads(request.body)
             user    = request.user
-            cart_id = request.GET.get('id')
+            cart_id = data['cart_id']
             cart    = Cart.objects.get(id=cart_id, user=user)
 
             cart.delete()
@@ -76,14 +79,14 @@ class CartView(View) :
         except ValueError :
             return JsonResponse({'message':'VAULE_ERROR'}, status=400)
 
-    @LoginDecorator
+    @login_decorator
     def patch(self, request) :
         try :
             data     = json.loads(request.body)
-            user     = request.user
-            cart_id  = request.GET.get('id')
+            user     = request.user.id
+            cart_id  = data['cart_id']
             quantity = data['quantity']
-
+           
             if quantity <= 0:
                 return JSONDecodeError({'message':'QUANTITY_ERROR'}, status=400)
 
@@ -94,6 +97,8 @@ class CartView(View) :
             return JsonResponse({'quantity':cart.quantity}, status=200)
 
         except MultipleObjectsReturned:
-            return JSONDecodeError({'message':'MULTIPLE_OBJECT_RETURNED'}, status=400)
-        except ValueError :
-            return JSONDecodeError({'message':'VALUE_ERROR'}, status=400)
+            return JsonResponse({'message':'MULTIPLE_OBJECT_RETURNED'}, status=400)
+        except JSONDecodeError :
+            return JsonResponse({'message':'JSON_DECODE_ERROR'}, status=400)
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)   
