@@ -8,43 +8,43 @@ from categories.models    import FirstCategory, SecondCategory
 
 class ProductListView(View):
     def get(self, request):
-        first_category_id  = request.GET.get('first-category')
-        second_category_id = request.GET.get('second-category')
-        sort               = request.GET.get('sort')
-        tea_types          = request.GET.get('type')
-        limit              = int(request.GET.get('limit', 10))
-        offset             = int(request.GET.get('offset', 1))
-
-        queries = Q(second_category__first_category_id = 1)
-
-        if first_category_id:
-            if FirstCategory.objects.filter(id=first_category_id).exists():
-                queries = Q(second_category__first_category_id = first_category_id)
-            else:
-                return JsonResponse({'result': 'INVALID_FIRST_CATEGORY'}, status=404)
-        
-        if second_category_id:
-            if SecondCategory.objects.filter(id=second_category_id).exists():
-                queries = Q(second_category = second_category_id)
-            else:
-                return JsonResponse({'result': 'INVALID_SECOND_CATEGORY'}, status=404)
-
-        if tea_types:
-            tea_type_queries = Q()
-            
-            for tea_type in tea_types.split(','):
-                tea_type_queries |= Q(types__name=tea_type)
-
-            queries &= tea_type_queries
-
+        limit    = int(request.GET.get('limit', 10))
+        offset   = int(request.GET.get('offset', 1))
+        queries  = Q(second_category__first_category_id = 1)
         ordering = '-created_at'
 
-        if sort == 'price-desc':
-            ordering = '-price'
+        if request.GET:
+            first_category_id  = request.GET.get('first-category')
+            second_category_id = request.GET.get('second-category')
+            sort               = request.GET.get('sort')
+            tea_types          = request.GET.get('type')
+
+            if first_category_id:
+                if FirstCategory.objects.filter(id=first_category_id).exists():
+                    queries = Q(second_category__first_category_id = first_category_id)
+                else:
+                    return JsonResponse({'result': 'INVALID_FIRST_CATEGORY'}, status=404)
+            
+            if second_category_id:
+                if SecondCategory.objects.filter(id=second_category_id).exists():
+                    queries = Q(second_category = second_category_id)
+                else:
+                    return JsonResponse({'result': 'INVALID_SECOND_CATEGORY'}, status=404)
+
+            if tea_types:
+                tea_type_queries = Q()
+                
+                for tea_type in tea_types.split(','):
+                    tea_type_queries |= Q(types__name=tea_type)
+
+                queries &= tea_type_queries
+
+            if sort == 'price-desc':
+                ordering = '-price'
         
-        elif sort == 'price-asc':
-            ordering = 'price'
-        
+            elif sort == 'price-asc':
+                ordering = 'price'
+
         result = []
         products = Product.objects.filter(queries).order_by(ordering).distinct()
         
