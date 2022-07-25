@@ -32,7 +32,7 @@ class CartView(View) :
             cart.quantity += quantity
             cart.save()
             
-            if is_created == 0 :
+            if not is_created == 0 :
                 return JsonResponse({'message': 'UPDATE_SUCCESS'}, status=200)
             return JsonResponse({'message': 'CREATE_SUCCESS'}, status=201)
             
@@ -45,11 +45,10 @@ class CartView(View) :
 
     @login_decorator
     def get(self, request):
-        user  = request.user.id
-        carts = Cart.objects.filter(user_id=user)
+        carts = Cart.objects.filter(user=request.user)
         
         result = [{
-            'username'        : user,
+            'username'        : cart.user.username,
             'cart_id'         : cart.id,
             'product_id'      : cart.product.id,
             'title'           : cart.product.title,
@@ -83,14 +82,13 @@ class CartView(View) :
     def patch(self, request) :
         try :
             data     = json.loads(request.body)
-            user     = request.user.id
             cart_id  = data['cart_id']
             quantity = data['quantity']
            
             if quantity <= 0:
                 return JSONDecodeError({'message':'QUANTITY_ERROR'}, status=400)
 
-            cart = Cart.objects.get(id=cart_id, user=user)
+            cart = Cart.objects.get(id=cart_id, user=request.user.id)
 
             cart.quantity = data['quantity']
             cart.save()
