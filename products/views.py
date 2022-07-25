@@ -19,7 +19,7 @@ class ProductListView(View):
             tea_types          = request.GET.getlist('type')
             limit              = int(request.GET.get('limit', 10))
             offset             = int(request.GET.get('offset', 1))
-
+            
             if first_category_id:
                 if FirstCategory.objects.filter(id=first_category_id).exists():
                     queries = Q(second_category__first_category_id = first_category_id)
@@ -35,7 +35,7 @@ class ProductListView(View):
             if tea_types:
                 tea_type_queries = Q()
                 
-                for tea_type in tea_types[0].split(','):
+                for tea_type in tea_types:
                     tea_type_queries |= Q(types__name=tea_type)
 
                 queries &= tea_type_queries
