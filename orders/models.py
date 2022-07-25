@@ -6,7 +6,7 @@ class Order(TimeStampModel) :
     user         = models.ForeignKey('users.User', on_delete=models.CASCADE)
     product      = models.ForeignKey('products.Product', on_delete=models.CASCADE)
     order_status = models.ForeignKey('OrderStatus', on_delete=models.CASCADE)
-    address      = models.CharField()
+    address      = models.CharField(max_length=400)
 
     class Meta :
        db_table = 'orders'
