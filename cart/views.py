@@ -3,7 +3,6 @@ from json.decoder           import JSONDecodeError
 
 from django.views           import View
 from django.http            import JsonResponse
-from django.core.exceptions import MultipleObjectsReturned
 
 from cart.models            import Cart
 from users.models           import User
@@ -37,7 +36,7 @@ class CartView(View) :
             return JsonResponse({'message': 'CREATE_SUCCESS'}, status=201)
             
         except Cart.DoesNotExist :
-            return JSONDecodeError({'message':'INVAILD_CART'}, status=400)
+            return JsonResponse({'message':'CART_DoesNotExist'}, status=400)
         except JSONDecodeError :
             return JsonResponse({'message':'JSON_DECODE_ERROR'}, status=400)
         except KeyError :
@@ -73,8 +72,8 @@ class CartView(View) :
             cart.delete()
             return JsonResponse({'message':'DELETED'}, status=200)
 
-        except MultipleObjectsReturned :
-            return JsonResponse({'message':'MULTIPLE_OBJECTS_RETURNED'}, status=400)
+        except Cart.DoesNotExist :
+            return JsonResponse({'message':'CART_DoesNotExist'}, status=400)
         except ValueError :
             return JsonResponse({'message':'VAULE_ERROR'}, status=400)
 
@@ -94,8 +93,8 @@ class CartView(View) :
             cart.save()
             return JsonResponse({'quantity':cart.quantity}, status=200)
 
-        except MultipleObjectsReturned:
-            return JsonResponse({'message':'MULTIPLE_OBJECT_RETURNED'}, status=400)
+        except Cart.DoesNotExist :
+            return JsonResponse({'message':'CART_DoesNotExist'}, status=400)
         except JSONDecodeError :
             return JsonResponse({'message':'JSON_DECODE_ERROR'}, status=400)
         except KeyError:
