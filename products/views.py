@@ -4,48 +4,34 @@ from django.db.models      import Q
 from django.core.paginator import Paginator
 
 from products.models    import Product
-from categories.models    import FirstCategory, SecondCategory
 
 class ProductListView(View):
     def get(self, request):
-        limit    = 10
-        offset   = 1
+        limit              = request.GET.get("limit", 10)
+        offset             = request.GET.get("offset", 1)
+        first_category_id  = request.GET.get('first-category')
+        second_category_id = request.GET.get('second-category')
+        sort               = request.GET.get('sort')
+        tea_types          = request.GET.getlist('type')
+
         queries  = Q(second_category__first_category_id = 1)
 
-        if request.GET:
-            first_category_id  = request.GET.get('first-category')
-            second_category_id = request.GET.get('second-category')
-            sort               = request.GET.get('sort')
-            tea_types          = request.GET.getlist('type')
-            limit              = int(request.GET.get('limit', 10))
-            offset             = int(request.GET.get('offset', 1))
-            
-            if first_category_id:
-                if FirstCategory.objects.filter(id=first_category_id).exists():
-                    queries = Q(second_category__first_category_id = first_category_id)
-                else:
-                    return JsonResponse({'result': 'INVALID_FIRST_CATEGORY'}, status=404)
-            
-            if second_category_id:
-                if SecondCategory.objects.filter(id=second_category_id).exists():
-                    queries = Q(second_category = second_category_id)
-                else:
-                    return JsonResponse({'result': 'INVALID_SECOND_CATEGORY'}, status=404)
+        if first_category_id:
+            queries = Q(second_category__first_category_id = first_category_id)
 
-            if tea_types:
-                tea_type_queries = Q()
-                
-                for tea_type in tea_types:
-                    tea_type_queries |= Q(types__name=tea_type)
+        if second_category_id:
+            queries = Q(second_category = second_category_id)
 
-                queries &= tea_type_queries
+        if tea_types:
+            tea_type_queries = Q()
+            tea_type_queries |= Q(types__name__in = tea_types)
+            queries &= tea_type_queries
 
-            sort_dict = {
-                'price-desc' : '-price', 
-                'price-asc'  : 'price' 
-            }
-
-            ordering = sort_dict.get(sort, '-created_at')
+        sort_dict = {
+            'price-desc' : '-price', 
+            'price-asc'  : 'price' 
+        }
+        ordering = sort_dict.get(sort, '-created_at')
 
         products = Product.objects.filter(queries).order_by(ordering).distinct()
         
@@ -55,13 +41,12 @@ class ProductListView(View):
         if offset < 1 or offset > pages_count:
             return JsonResponse({'result': 'INVALID_PAGE'}, status=404)
 
-        total = []
-        total.append({
+        total = {
             'total_items' : products.count(),
             'total_pages' : pages_count,
             'current_page': offset,
             'limit'       : limit
-            })
+            }
         
         result = []
         page_items = p.page(offset) 
