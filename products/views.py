@@ -48,10 +48,10 @@ class ProductListView(View):
             'limit'       : limit
             }
         
-        result = []
+        products = []
         page_items = p.page(offset) 
         for page_item in page_items:
-            result.append({
+            products.append({
                 'id'              : page_item.id,
                 'title'           : page_item.title,
                 'price'           : page_item.price,
@@ -60,5 +60,5 @@ class ProductListView(View):
                 'types'           : [type.name for type in page_item.types.all()]
             })
 
-        return JsonResponse({'total' : total, 'result': result}, status=200)
+        return JsonResponse({'total' : total, 'products': products}, status=200)
         
