@@ -25,13 +25,16 @@ class CartView(View) :
                 return JsonResponse({'message':'QUANTITY_ERROR'}, status=400)
         
             cart, is_created  = Cart.objects.get_or_create(
-                user_id       = user.id,
-                product_id    = product_id
+                user_id    = user.id,
+                product_id = product_id,
+                defaults   = {"quantity" : quantity}
             )
-            cart.quantity += quantity
-            cart.save()
             
-            if not is_created == 0 :
+            
+            if not is_created :
+                cart.quantity += quantity
+                cart.save()
+
                 return JsonResponse({'message': 'UPDATE_SUCCESS'}, status=200)
             return JsonResponse({'message': 'CREATE_SUCCESS'}, status=201)
             
