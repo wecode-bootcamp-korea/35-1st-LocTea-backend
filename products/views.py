@@ -8,16 +8,17 @@ from categories.models    import FirstCategory, SecondCategory
 
 class ProductListView(View):
     def get(self, request):
-        limit    = int(request.GET.get('limit', 10))
-        offset   = int(request.GET.get('offset', 1))
+        limit    = 10
+        offset   = 1
         queries  = Q(second_category__first_category_id = 1)
-        ordering = '-created_at'
 
         if request.GET:
             first_category_id  = request.GET.get('first-category')
             second_category_id = request.GET.get('second-category')
             sort               = request.GET.get('sort')
-            tea_types          = request.GET.get('type')
+            tea_types          = request.GET.getlist('type')
+            limit              = int(request.GET.get('limit', 10))
+            offset             = int(request.GET.get('offset', 1))
 
             if first_category_id:
                 if FirstCategory.objects.filter(id=first_category_id).exists():
@@ -34,18 +35,18 @@ class ProductListView(View):
             if tea_types:
                 tea_type_queries = Q()
                 
-                for tea_type in tea_types.split(','):
+                for tea_type in tea_types[0].split(','):
                     tea_type_queries |= Q(types__name=tea_type)
 
                 queries &= tea_type_queries
 
-            if sort == 'price-desc':
-                ordering = '-price'
-        
-            elif sort == 'price-asc':
-                ordering = 'price'
+            sort_dict = {
+                'price-desc' : '-price', 
+                'price-asc'  : 'price' 
+            }
 
-        result = []
+            ordering = sort_dict.get(sort, '-created_at')
+
         products = Product.objects.filter(queries).order_by(ordering).distinct()
         
         p = Paginator(products, limit)
@@ -54,13 +55,15 @@ class ProductListView(View):
         if offset < 1 or offset > pages_count:
             return JsonResponse({'result': 'INVALID_PAGE'}, status=404)
 
-        result.append({
+        total = []
+        total.append({
             'total_items' : products.count(),
             'total_pages' : pages_count,
             'current_page': offset,
             'limit'       : limit
             })
-
+        
+        result = []
         page_items = p.page(offset) 
         for page_item in page_items:
             result.append({
@@ -72,5 +75,5 @@ class ProductListView(View):
                 'types'           : [type.name for type in page_item.types.all()]
             })
 
-        return JsonResponse({'result': result}, status=200)
+        return JsonResponse({'total' : total, 'result': result}, status=200)
         
