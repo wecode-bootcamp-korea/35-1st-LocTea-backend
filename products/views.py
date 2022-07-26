@@ -41,12 +41,12 @@ class ProductListView(View):
         sort               = request.GET.get('sort', 'new-arrival')
         tea_types          = request.GET.getlist('type')
 
-        if first_category_id:
+        if second_category_id:
+            queries = Q(second_category = second_category_id)
+
+        elif first_category_id:
             queries = Q(second_category__first_category_id = first_category_id)
 
-        elif second_category_id:
-            queries = Q(second_category = second_category_id)
-        
         if tea_types:
             queries &= Q(types__name__in = tea_types)
         
@@ -62,7 +62,7 @@ class ProductListView(View):
         ordering = sort_dict.get(sort)
         
         products = Product.objects.filter(queries).order_by(ordering).distinct()
-        
+        print([product.title for product in products])
         p = Paginator(products, limit)
         pages_count = p.num_pages
 
