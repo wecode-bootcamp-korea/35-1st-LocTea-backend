@@ -34,13 +34,21 @@ class ProductItemView(View):
 
 class ProductListView(View):
     def get(self, request):
-        limit              = int(request.GET.get("limit", 10))
-        offset             = int(request.GET.get("offset", 1))
+        summer_gift        = request.GET.get('summer-gift')
+        popular_gift       = request.GET.get('popular-gift')
+        time_sale          = request.GET.get('time-sale')
+        
         first_category_id  = request.GET.get('first-category', 1)
         second_category_id = request.GET.get('second-category')
         sort               = request.GET.get('sort', 'new-arrival')
         tea_types          = request.GET.getlist('type')
 
+        limit              = int(request.GET.get("limit", 10))
+        offset             = int(request.GET.get("offset", 1))
+
+        if summer_gift:
+            second_category_id = 5
+        
         if second_category_id:
             queries = Q(second_category = second_category_id)
 
@@ -49,11 +57,15 @@ class ProductListView(View):
 
         if tea_types:
             queries &= Q(types__name__in = tea_types)
+
+        if popular_gift:
+            sort = 'popular_gift'
         
         sort_dict = {
-            'price-desc' : '-price',
-            'price-asc'  : 'price',
-            'new-arrival': '-created_at'
+            'price-desc'  : '-price',
+            'price-asc'   : 'price',
+            'new-arrival' : '-created_at',
+            'popular_gift': 'stock'
         }
 
         if not sort in sort_dict.keys():
@@ -61,8 +73,11 @@ class ProductListView(View):
 
         ordering = sort_dict.get(sort)
         
+        if summer_gift or popular_gift:
+            limit = 7
+
         products = Product.objects.filter(queries).order_by(ordering).distinct()
-        print([product.title for product in products])
+        
         p = Paginator(products, limit)
         pages_count = p.num_pages
 
@@ -86,5 +101,8 @@ class ProductListView(View):
             'types'           : [type.name for type in page_item.types.all()]
         } for page_item in page_items]
 
-        return JsonResponse({'total' : total, 'products': products}, status=200)
+        if summer_gift or popular_gift or time_sale:
+            return JsonResponse({'products': products}, status=200)
+        else:
+            return JsonResponse({'total' : total, 'products': products}, status=200)
         
