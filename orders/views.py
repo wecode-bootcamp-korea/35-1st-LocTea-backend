@@ -3,6 +3,7 @@ import json
 from django.views    import View
 from django.http     import JsonResponse
 from json.decoder    import JSONDecodeError
+from django.db       import transaction
 
 from cart.models            import Cart
 from users.models           import User
@@ -12,6 +13,7 @@ from core.utils             import login_decorator
 
 class OrderView(View):
     @login_decorator
+    @transaction.atomic
     def post(self, request):
         try:
             data         = json.loads(request.body)
@@ -19,17 +21,30 @@ class OrderView(View):
             product_id   = data['product_id']
             order_status = data['order_status']
             order_id     = data['order_id']
+            cart_id      = data['cart_id']
+            cart         = Cart.objects.get(id=cart_id)
+
         
         
             if not Order.objects.filter(id=order_id).exists():
-            
                 Order.objects.create(
-                    user = user,
-                    product_id   = product_id,
-                    order_status = order_status,
+                        user = user,
+                        product_id   = product_id,
+                        order_status = order_status,
                 )
-            
+
+                Delivery.object.create(
+                    address = address,
+
+                        
+                )
+                cart_id = order.get('cart_id', None)
+                
+                if cart_id:
+                    cart.delete()    
+                
             return JsonResponse({'message': 'SUCCESS'}, status=200)
+
         
         except JSONDecodeError :
             return JsonResponse({'message': "JSON_DECODE_ERROR"}, status=400)
