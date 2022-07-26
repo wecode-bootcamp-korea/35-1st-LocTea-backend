@@ -14,16 +14,20 @@ class OrderView(View):
     @login_decorator
     def post(self, request):
         try:
-            data = json.loads(request.body)    
-            product_id = data["product_id"]    
-            order = data["order"]
+            data         = json.loads(request.body)
+            user         = request.user
+            product_id   = data['product_id']
+            order_status = data['order_status']
+            order_id     = data['order_id']
+        
+        
+            if not Order.objects.filter(id=order_id).exists():
             
-            Order.objects.create(
-                user         = request.user,
-                product_id   = product_id,
-                order_status = order['status'],
-                address      = order['address'],
-            )
+                Order.objects.create(
+                    user = user,
+                    product_id   = product_id,
+                    order_status = order_status,
+                )
             
             return JsonResponse({'message': 'SUCCESS'}, status=200)
         
