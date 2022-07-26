@@ -16,17 +16,17 @@ class OrderView(View):
             data = json.loads(request.body)    
             product_id = data["product_id"]
             user = data["user.id"]      
-           
-            if Cart.quantity < 1 or Cart.quantity > Product.stock :
-                    return JsonResponse({"message" : "INVALID_QUANTITY"}, status=400)
+            order = data["order"]
 
-                Order.objects.create(
-                    user_id         = request.user.id,
-                    stock           = product.stock
-                    quantity        = cart.quantity,
-                    price           = order['price'],
-                    order_number    = order.id,
-                    order_status_id = 
+            
+            if Cart.quantity < 1 or Cart.quantity > Product.stock :
+                return JsonResponse({"message" : "INVALID_QUANTITY"}, status=400)
+
+            Order.objects.create(
+                user            = request.user.id,
+                stock           = order.product.stock,
+                order_number    = order.id,
+                order_status_id = 
 
     
         
