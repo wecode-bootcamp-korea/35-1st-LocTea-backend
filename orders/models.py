@@ -11,7 +11,6 @@ class Order(TimeStampModel) :
     class Meta :
        db_table = 'orders'
 
-
 class OrderStatus(models.Model) :
     status = models.CharField(max_length=200)
 
@@ -32,3 +31,12 @@ class OrderItemStatus(models.Model) :
 
     class Meta :
        db_table = 'order_items_status'
+
+class Delivery(models.Model) :
+    sender            = models.CharField(max_length=50)
+    recipient         = models.CharField(max_length=50)
+    recipient_contact = models.CharField(max_length=200)
+    order             = models.ForeignKey('Order', on_delete=models.CASCADE)
+
+    class Meta :
+       db_table = 'delivery'
