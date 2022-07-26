@@ -9,10 +9,9 @@ from django.conf        import settings
 def login_decorator(func):
     def wrapper(self, request, *args, **kwargs):
         try:
-
             access_token = request.headers.get('Authorization')
             payload      = jwt.decode(access_token, settings.SECRET_KEY, settings.ALGORITHM)
-            user_id      = payload['id']
+            user_id      = payload['user_id']
             request.user = User.objects.get(id = user_id)
 
             return func(self, request, *args, **kwargs)
