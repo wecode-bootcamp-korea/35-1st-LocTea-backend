@@ -39,4 +39,4 @@ class Delivery(models.Model) :
     address           = models.TextField()
 
     class Meta :
-       db_table = 'delivery'
+       db_table = 'deliveries'
