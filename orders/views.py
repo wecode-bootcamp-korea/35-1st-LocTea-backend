@@ -2,6 +2,7 @@ import json
 
 from django.views    import View
 from django.http     import JsonResponse
+from json.decoder    import JSONDecodeError
 
 from cart.models            import Cart
 from users.models           import User
@@ -14,19 +15,29 @@ class OrderView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)    
-            product_id = data["product_id"]
-            user = data["user.id"]      
+            product_id = data["product_id"]    
             order = data["order"]
+            
+         
+            Order.objects.create(
+                user         = request.user,
+                product_id   = product_id,
+                order_status = order['status'],
+                address      = order['address'],
+            )
+            
+            return JsonResponse({'message': 'SUCCESS'}, status=200)
+        
+        except JSONDecodeError :
+            return JsonResponse({'message': "JSON_DECODE_ERROR"}, status=400)
+        except KeyError :
+            return JsonResponse({"message": "KEY_ERROR"}, status=400)    
+
 
             
-            if Cart.quantity < 1 or Cart.quantity > Product.stock :
-                return JsonResponse({"message" : "INVALID_QUANTITY"}, status=400)
+               
 
-            Order.objects.create(
-                user            = request.user.id,
-                stock           = order.product.stock,
-                order_number    = order.id,
-                order_status_id = 
+
 
     
         
