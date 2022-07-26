@@ -34,14 +34,12 @@ class ProductItemView(View):
 
 class ProductListView(View):
     def get(self, request):
-        limit              = request.GET.get("limit", 10)
-        offset             = request.GET.get("offset", 1)
-        first_category_id  = request.GET.get('first-category')
+        limit              = int(request.GET.get("limit", 10))
+        offset             = int(request.GET.get("offset", 1))
+        first_category_id  = request.GET.get('first-category', 1)
         second_category_id = request.GET.get('second-category')
         sort               = request.GET.get('sort')
         tea_types          = request.GET.getlist('type')
-
-        queries  = Q(second_category__first_category_id = 1)
 
         if first_category_id:
             queries = Q(second_category__first_category_id = first_category_id)
@@ -50,10 +48,8 @@ class ProductListView(View):
             queries = Q(second_category = second_category_id)
 
         if tea_types:
-            tea_type_queries = Q()
-            tea_type_queries |= Q(types__name__in = tea_types)
-            queries &= tea_type_queries
-
+            queries &= Q(types__name__in = tea_types)
+        
         sort_dict = {
             'price-desc' : '-price', 
             'price-asc'  : 'price' 
@@ -73,19 +69,17 @@ class ProductListView(View):
             'total_pages' : pages_count,
             'current_page': offset,
             'limit'       : limit
-            }
+        }
         
-        products = []
         page_items = p.page(offset) 
-        for page_item in page_items:
-            products.append({
-                'id'              : page_item.id,
-                'title'           : page_item.title,
-                'price'           : page_item.price,
-                'stock'           : page_item.stock,
-                'thumbnail_images': [image.url for image in page_item.thumbnail_images.all()],
-                'types'           : [type.name for type in page_item.types.all()]
-            })
+        products = [{
+            'id'              : page_item.id,
+            'title'           : page_item.title,
+            'price'           : page_item.price,
+            'stock'           : page_item.stock,
+            'thumbnail_images': [image.url for image in page_item.thumbnail_images.all()],
+            'types'           : [type.name for type in page_item.types.all()]
+        } for page_item in page_items]
 
         return JsonResponse({'total' : total, 'products': products}, status=200)
         
