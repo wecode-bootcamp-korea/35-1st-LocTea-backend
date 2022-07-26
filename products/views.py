@@ -41,6 +41,8 @@ class ProductListView(View):
         sort               = request.GET.get('sort')
         tea_types          = request.GET.getlist('type')
 
+        queries = Q()
+
         if first_category_id:
             queries = Q(second_category__first_category_id = first_category_id)
 
@@ -55,7 +57,7 @@ class ProductListView(View):
             'price-asc'  : 'price' 
         }
         ordering = sort_dict.get(sort, '-created_at')
-
+        
         products = Product.objects.filter(queries).order_by(ordering).distinct()
         
         p = Paginator(products, limit)
