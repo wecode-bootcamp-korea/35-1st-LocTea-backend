@@ -72,3 +72,4 @@ class LogInView(View):
 
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"}, status=400)
+
