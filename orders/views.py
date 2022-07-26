@@ -18,7 +18,6 @@ class OrderView(View):
             product_id = data["product_id"]    
             order = data["order"]
             
-         
             Order.objects.create(
                 user         = request.user,
                 product_id   = product_id,
@@ -31,7 +30,10 @@ class OrderView(View):
         except JSONDecodeError :
             return JsonResponse({'message': "JSON_DECODE_ERROR"}, status=400)
         except KeyError :
-            return JsonResponse({"message": "KEY_ERROR"}, status=400)    
+            return JsonResponse({"message": "KEY_ERROR"}, status=400)
+
+    
+
 
 
             
