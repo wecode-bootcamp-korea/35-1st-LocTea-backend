@@ -44,7 +44,7 @@ class ProductListView(View):
         if first_category_id:
             queries = Q(second_category__first_category_id = first_category_id)
 
-        if second_category_id:
+        elif second_category_id:
             queries = Q(second_category = second_category_id)
 
         if tea_types:
@@ -54,6 +54,7 @@ class ProductListView(View):
             'price-desc' : '-price', 
             'price-asc'  : 'price' 
         }
+
         ordering = sort_dict.get(sort, '-created_at')
 
         products = Product.objects.filter(queries).order_by(ordering).distinct()
