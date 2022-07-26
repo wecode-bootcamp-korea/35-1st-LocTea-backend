@@ -47,10 +47,10 @@ class ProductListView(View):
             queries = Q(second_category__first_category_id = first_category_id)
 
         if second_category_id:
-            queries = Q(second_category = second_category_id)
+            queries &= Q(second_category = second_category_id)
 
         if tea_types:
-            queries &= Q(types__name__in = tea_types)
+            queries = Q(types__name__in = tea_types)
         
         sort_dict = {
             'price-desc' : '-price', 
