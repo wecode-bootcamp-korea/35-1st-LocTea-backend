@@ -62,7 +62,7 @@ class ProductListView(View):
         ordering = sort_dict.get(sort)
         
         products = Product.objects.filter(queries).order_by(ordering).distinct()
-        
+        print([product.title for product in products])
         p = Paginator(products, limit)
         pages_count = p.num_pages
 
