@@ -34,7 +34,3 @@ class DetailImage(models.Model):
     
     class Meta:
         db_table = 'detail_images'
-
-
-
-
