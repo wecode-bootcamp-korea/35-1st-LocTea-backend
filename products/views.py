@@ -38,7 +38,6 @@ class ProductListView(View):
         second_category_id = request.GET.get('second-category')
         sort               = request.GET.get('sort', 'new-arrival')
         tea_types          = request.GET.getlist('type')
-
         limit              = int(request.GET.get("limit", 10))
         offset             = int(request.GET.get("offset", 1))
         
