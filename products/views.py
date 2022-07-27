@@ -46,35 +46,40 @@ class ProductListView(View):
         limit              = int(request.GET.get("limit", 10))
         offset             = int(request.GET.get("offset", 1))
 
+        queries = Q()
+
         if summer_gift:
             second_category_id = 5
+            limit              = 7
+            queries            = Q(title__contains='아이스')
+
+        elif popular_gift:
+            limit = 7
+            sort = 'discount'
+
+        elif time_sale:
+            sort = 'discount'
         
         if second_category_id:
-            queries = Q(second_category = second_category_id)
+            queries &= Q(second_category = second_category_id)
 
         elif first_category_id:
             queries = Q(second_category__first_category_id = first_category_id)
 
         if tea_types:
             queries &= Q(types__name__in = tea_types)
-
-        if popular_gift:
-            sort = 'popular_gift'
         
         sort_dict = {
             'price-desc'  : '-price',
             'price-asc'   : 'price',
             'new-arrival' : '-created_at',
-            'popular_gift': 'stock'
+            'discount'    : '-discount'
         }
 
         if not sort in sort_dict.keys():
             return JsonResponse({'message': 'KEYERROR'}, status=400)
 
         ordering = sort_dict.get(sort)
-        
-        if summer_gift or popular_gift:
-            limit = 7
 
         products = Product.objects.filter(queries).order_by(ordering).distinct()
         
@@ -97,12 +102,17 @@ class ProductListView(View):
             'title'           : page_item.title,
             'price'           : page_item.price,
             'stock'           : page_item.stock,
+            'discount'        : page_item.discount,
             'thumbnail_images': [image.url for image in page_item.thumbnail_images.all()],
             'types'           : [type.name for type in page_item.types.all()]
         } for page_item in page_items]
 
-        if summer_gift or popular_gift or time_sale:
+        if summer_gift or popular_gift:
             return JsonResponse({'products': products}, status=200)
-        else:
+        
+        elif time_sale:
+            return JsonResponse({'products' : products[0]})
+
+        else:    
             return JsonResponse({'total' : total, 'products': products}, status=200)
         
