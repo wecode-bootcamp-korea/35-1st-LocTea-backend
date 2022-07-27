@@ -40,13 +40,13 @@ class ProductItemView(View):
 
 class ProductListView(View):
     def get(self, request):
-        limit              = int(request.GET.get("limit", 10))
-        offset             = int(request.GET.get("offset", 1))
         first_category_id  = request.GET.get('first-category', 1)
         second_category_id = request.GET.get('second-category')
         sort               = request.GET.get('sort', 'new-arrival')
         tea_types          = request.GET.getlist('type')
-
+        limit              = int(request.GET.get("limit", 10))
+        offset             = int(request.GET.get("offset", 1))
+        
         if second_category_id:
             queries = Q(second_category = second_category_id)
 
@@ -57,16 +57,17 @@ class ProductListView(View):
             queries &= Q(types__name__in = tea_types)
         
         sort_dict = {
-            'price-desc' : '-price',
-            'price-asc'  : 'price',
-            'new-arrival': '-created_at'
+            'price-desc'  : '-price',
+            'price-asc'   : 'price',
+            'new-arrival' : '-created_at',
+            'discount'    : '-discount'
         }
 
         if not sort in sort_dict.keys():
             return JsonResponse({'message': 'KEYERROR'}, status=400)
 
         ordering = sort_dict.get(sort)
-        
+
         products = Product.objects.filter(queries).order_by(ordering).distinct()
         
         p = Paginator(products, limit)
