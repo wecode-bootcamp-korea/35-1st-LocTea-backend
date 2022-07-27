@@ -40,10 +40,10 @@ class SignUpView(View):
                 return JsonResponse({"message":"BIRTHDAY_VALIDATION_ERROR"}, status=400)
             
             if User.objects.filter(username = username).exists():
-                return JsonResponse({"message":"DUPLICATION_ERROR"}, status=400)
+                return JsonResponse({"message":"DUPLICATION_USERNAME_ERROR"}, status=400)
 
             if User.objects.filter(email = email).exists():
-                return JsonResponse({"message":"DUPLICATION_ERROR"}, status=400)
+                return JsonResponse({"message":"DUPLICATION_EMAIL_ERROR"}, status=400)
         
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
