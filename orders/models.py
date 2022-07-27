@@ -6,10 +6,9 @@ class Order(TimeStampModel) :
     user         = models.ForeignKey('users.User', on_delete=models.CASCADE)
     product      = models.ForeignKey('products.Product', on_delete=models.CASCADE)
     order_status = models.ForeignKey('OrderStatus', on_delete=models.CASCADE)
-
+  
     class Meta :
        db_table = 'orders'
-
 
 class OrderStatus(models.Model) :
     status = models.CharField(max_length=200)
@@ -31,3 +30,13 @@ class OrderItemStatus(models.Model) :
 
     class Meta :
        db_table = 'order_items_status'
+
+class Delivery(models.Model) :
+    sender            = models.CharField(max_length=50)
+    recipient         = models.CharField(max_length=50)
+    recipient_contact = models.CharField(max_length=200)
+    order             = models.ForeignKey('Order', on_delete=models.CASCADE)
+    address           = models.TextField()
+
+    class Meta :
+       db_table = 'deliveries'
