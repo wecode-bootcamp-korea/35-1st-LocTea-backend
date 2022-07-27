@@ -15,10 +15,14 @@ class ProductItemView(View):
                 'id'              : product_id,
                 'title'           : product.title,
                 'description'     : product.description,
-                'first_category'  : {product.second_category.first_category.title : 
-                                    product.second_category.first_category.id},
-                'second_category' : {product.second_category.title : 
-                                    product.second_category.id},
+                'first_category'  : {
+                    'id'   : product.second_category.first_category.id,
+                    'title': product.second_category.first_category.title
+                    },
+                'second_category' : {
+                    'id'   : product.second_category.id,
+                    'title': product.second_category.title
+                    },
                 'price'           : product.price,
                 'stock'           : product.stock,
                 'discount'        : product.discount,
