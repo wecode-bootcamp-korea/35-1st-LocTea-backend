@@ -16,35 +16,37 @@ class OrderView(View):
     @transaction.atomic
     def post(self, request):
         try:
-            data         = json.loads(request.body)
-            user         = request.user
-            product_id   = data['product_id']
-            order_status = data['order_status']
-            order_id     = data['order_id']
-            cart_id      = data['cart_id']
-            cart         = Cart.objects.get(id=cart_id)
-       
-            if not Order.objects.filter(id=order_id).exists():
-                Order.objects.create(
-                    user         = user,
-                    product_id   = product_id,
-                    order_status = order_status,
+            data              = json.loads(request.body)
+            user              = request.user
+            product_id        = data['product_id']
+            order_status_id   = data['order_status']
+            order_id          = data['order_id']
+            address           = data['address']
+            recipient         = data['recipient']
+            recipient_contact = data['recipient_contact']
+            sender            = data['sender']
+            cart_id           = data['cart_id']
+            order_status      = OrderStatus.objects.get(id=order_status_id)
+            cart              = Cart.objects.get(id=cart_id)
+        
+            Order.objects.create(
+                user         = user,
+                product_id   = cart.product_id,
+                order_status = order_status,
                 )
-            if not Delivery.objects.filter(id=deliveries_id).exists():
-                Delivery.objects.create(
-                    address           = address,
-                    sender            = sender,
-                    recipient         = recipient,
-                    recipient_contact = recipient_contact,
-                    order_id          = order_id
-                )
-                cart_id = cart.get('cart_id', None)
-                
-                if cart_id:
-                    cart.delete()    
-                
+            Delivery.objects.create(
+                address           = address,
+                sender            = sender,
+                recipient         = recipient,
+                recipient_contact = recipient_contact,
+                order_id          = order_id
+                )   
+            cart.delete()
+            
             return JsonResponse({'message': 'SUCCESS'}, status=200)
         
+        except Cart.DoesNotExist :
+            return JsonResponse({'message': "Cart.DoesNotExist"}, status=400)    
         except JSONDecodeError :
             return JsonResponse({'message': "JSON_DECODE_ERROR"}, status=400)
         except KeyError :
