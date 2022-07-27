@@ -34,10 +34,6 @@ class ProductItemView(View):
 
 class ProductListView(View):
     def get(self, request):
-        summer_gift        = request.GET.get('summer-gift')
-        popular_gift       = request.GET.get('popular-gift')
-        time_sale          = request.GET.get('time-sale')
-        
         first_category_id  = request.GET.get('first-category', 1)
         second_category_id = request.GET.get('second-category')
         sort               = request.GET.get('sort', 'new-arrival')
@@ -45,23 +41,9 @@ class ProductListView(View):
 
         limit              = int(request.GET.get("limit", 10))
         offset             = int(request.GET.get("offset", 1))
-
-        queries = Q()
-
-        if summer_gift:
-            second_category_id = 5
-            limit              = 7
-            queries            = Q(title__contains='아이스')
-
-        elif popular_gift:
-            limit = 7
-            sort = 'discount'
-
-        elif time_sale:
-            sort = 'discount'
         
         if second_category_id:
-            queries &= Q(second_category = second_category_id)
+            queries = Q(second_category = second_category_id)
 
         elif first_category_id:
             queries = Q(second_category__first_category_id = first_category_id)
@@ -107,12 +89,5 @@ class ProductListView(View):
             'types'           : [type.name for type in page_item.types.all()]
         } for page_item in page_items]
 
-        if summer_gift or popular_gift:
-            return JsonResponse({'products': products}, status=200)
-        
-        elif time_sale:
-            return JsonResponse({'products' : products[0]})
-
-        else:    
-            return JsonResponse({'total' : total, 'products': products}, status=200)
+        return JsonResponse({'total' : total, 'products': products}, status=200)
         
