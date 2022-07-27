@@ -8,7 +8,7 @@ from django.db       import transaction
 from cart.models            import Cart
 from users.models           import User
 from products.models        import Product
-from orders.models          import Order, OrderStatus, OrderItem, OrderItemStatus
+from orders.models          import Delivery, Order, OrderStatus, OrderItem, OrderItemStatus
 from core.utils             import login_decorator
 
 class OrderView(View):
@@ -26,15 +26,17 @@ class OrderView(View):
        
             if not Order.objects.filter(id=order_id).exists():
                 Order.objects.create(
-                        user = user,
-                        product_id   = product_id,
-                        order_status = order_status,
+                    user         = user,
+                    product_id   = product_id,
+                    order_status = order_status,
                 )
             if not Delivery.objects.filter(id=deliveries_id).exists():
-                Delivery.object.create(
-                    address = address,
-
-                        
+                Delivery.objects.create(
+                    address           = address,
+                    sender            = sender,
+                    recipient         = recipient,
+                    recipient_contact = recipient_contact,
+                    order_id          = order_id
                 )
                 cart_id = cart.get('cart_id', None)
                 
