@@ -14,19 +14,24 @@ class SignUpView(View):
         try:
             data           = json.loads(request.body)
 
-            name          = data['name']
-            username      = data['username']
-            password      = data['password']
-            mobile_number = data['mobile_number']
-            birth_day     = data['birth_day']
+            name           = data['name']
+            username       = data['username']
+            email          = data['email']
+            password       = data['password']
+            mobile_number  = data['mobile_number']
+            birth_day      = data['birth_day']
 
             REGEX_ID       = '^[a-zA-Z0-9]{4,12}$'
+            REGEX_EMAIL    = '^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$'
             REGEX_PASSWORD = '^(?=.*[a-z])(?=.*\d)(?=.*[$@$!%*#?&])[a-z\d$@$!%*#?&]{8,16}$'
             REGEX_BIRTHDAY = '^(19\d{2}|20\d{2})-(0[0-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$'
             
 
             if not re.match(REGEX_ID, username):
                 return JsonResponse({"message":"ID_VALIDATION_ERROR"}, status=400)
+            
+            if not re.match(REGEX_EMAIL, email):
+                return JsonResponse({"message":"EMAIL_VALIDATION_ERROR"}, status=400)
 
             if not re.match(REGEX_PASSWORD, password):
                 return JsonResponse({"message":"PASSWORD_VALIDATION_ERROR"}, status=400)
@@ -35,13 +40,17 @@ class SignUpView(View):
                 return JsonResponse({"message":"BIRTHDAY_VALIDATION_ERROR"}, status=400)
             
             if User.objects.filter(username = username).exists():
-                return JsonResponse({"message":"DUPLICATION_ERROR"}, status=400)
+                return JsonResponse({"message":"DUPLICATION_USERNAME_ERROR"}, status=400)
+
+            if User.objects.filter(email = email).exists():
+                return JsonResponse({"message":"DUPLICATION_EMAIL_ERROR"}, status=400)
         
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
             User.objects.create(
                 name          = name,
                 username      = username,
+                email         = email,
                 password      = hashed_password,
                 mobile_number = mobile_number,
                 birth_day     = birth_day,
@@ -72,3 +81,4 @@ class LogInView(View):
 
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"}, status=400)
+
