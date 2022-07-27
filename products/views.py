@@ -87,6 +87,14 @@ class ProductListView(View):
         products = [{
             'id'              : page_item.id,
             'title'           : page_item.title,
+            'first_category'  : {
+                'id'   : page_item.second_category.first_category.id,
+                'title': page_item.second_category.first_category.title
+                },
+            'second_category' : {
+                'id'   : page_item.second_category.id,
+                'title': page_item.second_category.title
+                },
             'price'           : page_item.price,
             'stock'           : page_item.stock,
             'discount'        : page_item.discount,
