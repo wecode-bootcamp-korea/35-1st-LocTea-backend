@@ -51,13 +51,14 @@ class OrderView(View):
             return JsonResponse({'message': "JSON_DECODE_ERROR"}, status=400)
         except KeyError :
             return JsonResponse({"message": "KEY_ERROR"}, status=400)
-
+    
+    @login_decorator
     def get(self , request):
+    
         carts = Cart.objects.filter(user=request.user)
-            
+        
         result = [{
             'username'        : cart.user.username,
-            'cart_id'         : cart.id,
             'product_id'      : cart.product.id,
             'title'           : cart.product.title,
             'quantity'        : cart.quantity,
@@ -66,7 +67,7 @@ class OrderView(View):
             'discount'        : cart.product.discount,
             'stock'           : cart.product.stock,
             'total_price'     : int(cart.product.price) * int(cart.quantity),
-            'mobile_number'   : cart.user.mobile_phone
+            'mobile_number'   : cart.user.mobile_number
             
         } for cart in carts]
 
