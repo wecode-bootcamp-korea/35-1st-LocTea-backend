@@ -16,11 +16,13 @@ class SignUpView(View):
 
             name          = data['name']
             username      = data['username']
+            email         = data["email"]
             password      = data['password']
             mobile_number = data['mobile_number']
             birth_day     = data['birth_day']
 
             REGEX_ID       = '^[a-zA-Z0-9]{4,12}$'
+            REGEXEMAIL     = '^[a-zA-Z0-9+-.]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$'
             REGEX_PASSWORD = '^(?=.*[a-z])(?=.*\d)(?=.*[$@$!%*#?&])[a-z\d$@$!%*#?&]{8,16}$'
             REGEX_BIRTHDAY = '^(19\d{2}|20\d{2})-(0[0-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$'
             
@@ -36,12 +38,16 @@ class SignUpView(View):
             
             if User.objects.filter(username = username).exists():
                 return JsonResponse({"message":"DUPLICATION_ERROR"}, status=400)
+
+            if User.objects.filter(email = email).exists():
+                return JsonResponse({"message":"DUPLICATION_ERROR"}, status=400)
         
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
             User.objects.create(
                 name          = name,
                 username      = username,
+                email         = email,
                 password      = hashed_password,
                 mobile_number = mobile_number,
                 birth_day     = birth_day,
@@ -72,3 +78,4 @@ class LogInView(View):
 
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"}, status=400)
+
