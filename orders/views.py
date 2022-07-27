@@ -23,30 +23,47 @@ class OrderView(View):
             order_id     = data['order_id']
             cart_id      = data['cart_id']
             cart         = Cart.objects.get(id=cart_id)
-
-        
-        
+       
             if not Order.objects.filter(id=order_id).exists():
                 Order.objects.create(
                         user = user,
                         product_id   = product_id,
                         order_status = order_status,
                 )
-
+            if not Delivery.objects.filter(id=deliveries_id).exists():
                 Delivery.object.create(
                     address = address,
 
                         
                 )
-                cart_id = order.get('cart_id', None)
+                cart_id = cart.get('cart_id', None)
                 
                 if cart_id:
                     cart.delete()    
                 
             return JsonResponse({'message': 'SUCCESS'}, status=200)
-
         
         except JSONDecodeError :
             return JsonResponse({'message': "JSON_DECODE_ERROR"}, status=400)
         except KeyError :
             return JsonResponse({"message": "KEY_ERROR"}, status=400)
+
+    def get(self , request):
+        carts = Cart.objects.filter(user=request.user)
+            
+        result = [{
+            'username'        : cart.user.username,
+            'cart_id'         : cart.id,
+            'product_id'      : cart.product.id,
+            'title'           : cart.product.title,
+            'quantity'        : cart.quantity,
+            'price'           : cart.product.price,
+            'thumbnail_images': cart.product.thumbnail_images.first().url,
+            'discount'        : cart.product.discount,
+            'stock'           : cart.product.stock,
+            'total_price'     : int(cart.product.price) * int(cart.quantity),
+            'mobile_number'   : cart.user.mobile_phone
+            
+        } for cart in carts]
+
+        return JsonResponse({"result":result}, status = 200)
