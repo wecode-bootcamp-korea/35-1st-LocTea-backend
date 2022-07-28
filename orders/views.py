@@ -54,32 +54,15 @@ class OrderView(View):
     
     @login_decorator
     def get(self , request):
-    
-        carts = Cart.objects.filter(user=request.user)
-        
+
+        orders = Order.objects.filter(user=request.user)
+
         result = [{
-            'username'        : cart.user.username,
-            'product_id'      : cart.product.id,
-            'cart_id'         : cart.id,
-            'title'           : cart.product.title,
-            'quantity'        : cart.quantity,
-            'price'           : cart.product.price,
-            'thumbnail_images': cart.product.thumbnail_images.first().url,
-            'discount'        : cart.product.discount,
-            'stock'           : cart.product.stock,
-            'total_price'     : int(cart.product.price) * int(cart.quantity),
-            'mobile_number'   : cart.user.mobile_number,
-            
-        } for cart in carts]
-
-        orders = Order.objects.get(user=request.user)
-
-        result2 = [{
             'order_id'         : order.id,
                
         } for order in orders]
  
-        return JsonResponse({"result":result , "result2":result2}, status = 200)
+        return JsonResponse({"result":result}, status = 200)
         
         
         
