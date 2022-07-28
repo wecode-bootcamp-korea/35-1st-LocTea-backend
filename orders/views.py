@@ -71,7 +71,15 @@ class OrderView(View):
             'mobile_number'   : cart.user.mobile_number,
             
         } for cart in carts]
-        return JsonResponse({"result":result}, status = 200)
+
+        orders = Order.objects.get(user=request.user)
+
+        result2 = [{
+            'order_id'         : order.id,
+               
+        } for order in orders]
+ 
+        return JsonResponse({"result":result , "result2":result2}, status = 200)
         
         
         
