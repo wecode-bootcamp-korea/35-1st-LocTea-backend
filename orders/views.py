@@ -10,6 +10,7 @@ from users.models           import User
 from products.models        import Product
 from orders.models          import Delivery, Order, OrderStatus, OrderItem, OrderItemStatus
 from core.utils             import login_decorator
+from core.enums             import OrderStatusEnum
 
 class OrderView(View):
     @login_decorator
@@ -18,15 +19,14 @@ class OrderView(View):
         try:
             data              = json.loads(request.body)
             user              = request.user
-            product_id        = data['product_id']
-            order_status_id   = data['order_status']
             order_id          = data['order_id']
             address           = data['address']
             recipient         = data['recipient']
             recipient_contact = data['recipient_contact']
             sender            = data['sender']
             cart_id           = data['cart_id']
-            order_status      = OrderStatus.objects.get(id=order_status_id)
+            
+            order_status      = OrderStatus.objects.get(id=OrderStatusEnum.COMPLETED.value)
             cart              = Cart.objects.get(id=cart_id)
         
             Order.objects.create(
@@ -60,6 +60,7 @@ class OrderView(View):
         result = [{
             'username'        : cart.user.username,
             'product_id'      : cart.product.id,
+            'cart_id'         : cart.id,
             'title'           : cart.product.title,
             'quantity'        : cart.quantity,
             'price'           : cart.product.price,
@@ -67,8 +68,10 @@ class OrderView(View):
             'discount'        : cart.product.discount,
             'stock'           : cart.product.stock,
             'total_price'     : int(cart.product.price) * int(cart.quantity),
-            'mobile_number'   : cart.user.mobile_number
+            'mobile_number'   : cart.user.mobile_number,
             
         } for cart in carts]
-
         return JsonResponse({"result":result}, status = 200)
+        
+        
+        

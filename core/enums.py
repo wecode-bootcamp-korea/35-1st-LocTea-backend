@@ -1,5 +1,5 @@
 from enum import Enum
 
-class OrderStatus(Enum):
+class OrderStatusEnum(Enum):
     COMPLETED=1 
     CANCELED=2
