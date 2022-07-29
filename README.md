@@ -56,6 +56,12 @@
 <br>
 
 ## 시연 영상
+![화면_기록_2022-07-29_오후_5_14_33_AdobeExpress](https://user-images.githubusercontent.com/47664802/181719682-634c4dd5-c52c-40db-917d-bc361f809555.gif)
+![화면_기록_2022-07-29_오후_5_15_53_AdobeExpress](https://user-images.githubusercontent.com/47664802/181719701-fd74d457-2aa2-492c-abfa-74bec8b78b8d.gif)
+![화면_기록_2022-07-29_오후_5_16_20_AdobeExpress](https://user-images.githubusercontent.com/47664802/181719712-d4b14ec7-6c6b-401a-b9df-5b26a6e5052b.gif)
+![화면_기록_2022-07-29_오후_5_22_17_AdobeExpress](https://user-images.githubusercontent.com/47664802/181719721-187ef397-7a65-4ac3-be21-c7ac834e7a9c.gif)
+![화면_기록_2022-07-29_오후_5_22_42_AdobeExpress](https://user-images.githubusercontent.com/47664802/181719734-c9591829-befe-43c0-86f0-f43d93afc795.gif)
+![화면_기록_2022-07-29_오후_5_21_28_AdobeExpress](https://user-images.githubusercontent.com/47664802/181719748-e84ae082-49b0-4af1-be01-0d5d19a86f67.gif)
 
 
 <br>
