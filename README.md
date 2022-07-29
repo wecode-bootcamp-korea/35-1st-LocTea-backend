@@ -40,3 +40,9 @@
    
 ## 시연 영상
 
+
+## API 명세서
+https://charmed-skirt-18c.notion.site/API-ad9f438727804f96bec469adebec53cd
+
+## 트렐로
+![화면_기록_2022-07-29_오후_5_10_50_AdobeExpress](https://user-images.githubusercontent.com/47664802/181715499-75db2412-000a-4e56-8c1b-d6162ce2d714.gif)
